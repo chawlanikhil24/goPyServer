@@ -1,6 +1,5 @@
 import socket
 import json
-import sys
 
 class pyServ():
 
