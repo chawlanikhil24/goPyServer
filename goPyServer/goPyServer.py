@@ -1,5 +1,6 @@
 import socket
 import json
+import sys
 
 class pyServ():
 
@@ -23,7 +24,11 @@ class pyServ():
         self.socketConn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socketConn.bind(self.addr)
         self.socketConn.listen(self.listen)
-        self.packetConn, client_address = self.socketConn.accept()
+        try:
+            self.packetConn, client_address = self.socketConn.accept()
+        except KeyboardInterrupt:
+            print "Receive Signal Interrupt"
+            self.packetConn.close()
 
     def getRPC(self):
         rpc = self.payload()
@@ -57,10 +62,15 @@ class pyServ():
         return self.payload()
 
     def RPCServer(self):
-        while True:
-            try:
-                connection, client_address = self.socketConn.accept()
-                self.packetConn = connection
+        try:
+            while True:
+                try:
+                    connection, client_address = self.socketConn.accept()
+                    self.packetConn = connection
+                except KeyboardInterrupt as e:
+                        print "Signal Interrupt..."
+                        self.sendResponse(e)
+                        connection.close()
                 rpc = self.payload()
                 functionName = rpc["method"]
                 if functionName in self.function:
@@ -68,8 +78,9 @@ class pyServ():
                     resp = self.__executeFunc__(functionName, arguments)
                     self.sendResponse(resp)
                     self.sendResponse("Function not Registered at Server Side")
-            except Exception as e:
-                    self.sendResponse(e)
+        except Exception as e:
+                print e
+
 
     def sendDefaultResponse(self):
         self.packetConn.send(json.dumps({"response":self.DefaultResponse}, encoding='utf-8'))
