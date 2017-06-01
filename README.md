@@ -24,7 +24,7 @@ Follow these steps and you are on:
 
   * Clone the library from github
       ```
-        https://github.com/chawlanikhil24/goPyServer.git
+        git clone https://github.com/chawlanikhil24/goPyServer.git
       ```
   * Install this library in your system, preferably in a Virtual environment
       ```
